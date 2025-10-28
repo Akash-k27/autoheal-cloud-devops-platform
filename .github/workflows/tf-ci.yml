@@ -1,4 +1,4 @@
-[A[Bname: terraform-ci
+name: terraform-ci
 
 on:
   pull_request:
@@ -14,15 +14,12 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      # Format check (fails if files need formatting)
       - name: Terraform fmt check
         working-directory: infra/terraform
         run: terraform fmt -check -recursive
 
-      # Validate without backend (so it doesn't try to access remote state)
       - name: Terraform validate (env=dev)
         working-directory: infra/terraform/envs/dev
         run: |
           terraform init -backend=false
           terraform validate -no-color
-

@@ -1,62 +1,139 @@
-# â˜ï¸ AutoHeal Cloud â€” DevOps Platform (Terraform + AWS)
+# â˜ï¸ AutoHeal Cloud â€” Self-Healing Secure DevOps Platform
 
-## í³– Overview
-**AutoHeal Cloud** is a modular, production-grade DevOps project demonstrating:
-- EC2 **Auto-Healing Web Service** (ASG + ALB)
-- Terraform **Infrastructure as Code**
-- **CloudWatch Monitoring**
-- **GitHub Actions CI/CD**
-- GPG **Signed Commits** (verified)
-
-Built end-to-end by **Akash K**, AWS Certified Cloud Practitioner & DevOps Engineer.
-
----
-
-## í¿—ï¸ Architecture
-Client â†’ ALB (HTTP :80 /health)
-â†“
-Target Group
-â†“
-Auto Scaling Group
-â†³ EC2 Instances (Launch Template + Nginx User Data)
-
-
-
-- Load Balancer health checks `/health`
-- Auto Scaling Group replaces unhealthy instances
-- CloudWatch alarms for target health & 5XX errors
-- CI workflow validates every Terraform change
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Build Status](https://github.com/Akash-k27/autoheal-cloud-devops-platform/actions/workflows/tf-ci.yml/badge.svg)](https://github.com/Akash-k27/autoheal-cloud-devops-platform/actions)
+![Terraform](https://img.shields.io/badge/Terraform-Yes-623CE4?logo=terraform)
+![AWS](https://img.shields.io/badge/AWS-Deployed-232F3E?logo=amazon-aws)
+![CloudWatch](https://img.shields.io/badge/Monitoring-CloudWatch-FF9900?logo=amazonaws)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)
+![Prometheus](https://img.shields.io/badge/Prometheus-Metrics-E6522C?logo=prometheus)
+![Grafana](https://img.shields.io/badge/Grafana-Dashboard-F46800?logo=grafana)
 
 ---
 
-## í·± Tech Stack
-- **AWS:** EC2, ALB, ASG, CloudWatch
-- **Terraform:** IaC modules for infra automation
-- **CI/CD:** GitHub Actions
-- **Monitoring:** CloudWatch alarms + future Prometheus/Grafana integration
+### Short Summary  
+**AutoHeal Cloud** is a self-healing, observable, and secure AWS DevOps platform â€” built with **Terraform**, **CloudWatch**, **SNS**, and **GitHub Actions CI**.  
+It automates detection, alerting, and recovery of unhealthy EC2 instances using AWS native services.
 
 ---
 
-## í·© Repository Phases
+## ğŸ“š Table of Contents
+- [Overview](#-overview)
+- [Architecture Overview](#-architecture-overview)
+- [Tech Stack](#-tech-stack)
+- [Phases Implemented](#-phases-implemented)
+- [Setup Instructions](#-setup-instructions)
+- [CloudWatch Monitoring](#-cloudwatch-monitoring)
+- [Future Enhancements](#-future-enhancements)
+- [Contact](#-contact)
+
+---
+
+## ğŸ§© Overview
+AutoHeal Cloud demonstrates **end-to-end DevOps practices** including:
+- Infrastructure as Code (Terraform)
+- CI/CD validation (GitHub Actions)
+- Auto-healing infrastructure with ASG
+- Cloud-native monitoring and alerting
+- Documentation by phase for clarity
+
+This project **detects and replaces failed EC2 instances** automatically through Auto Scaling Groups and triggers **SNS alerts** during failures.
+
+---
+
+## ğŸ§­ Architecture Overview
+
+> _High-level workflow of AutoHeal Cloud Platform_
+
+```
+Client â†’ Application Load Balancer (HTTP:80)
+              â†“
+        Target Group (/health)
+              â†“
+    Auto Scaling Group (min=2, max=4)
+          â”œâ”€â”€ EC2 Instance (Nginx + CloudWatch Agent)
+          â””â”€â”€ EC2 Instance (Nginx + Node Exporter)
+```
+
+---
+
+## âš™ï¸ Tech Stack
+
+| Category | Tools & Services |
+|-----------|------------------|
+| **Infrastructure** | Terraform (modular design) |
+| **Cloud Platform** | AWS EC2, ALB, ASG, IAM, SNS, CloudWatch |
+| **Monitoring & Alerts** | CloudWatch Alarms, Dashboards, SNS |
+| **Automation** | Bash (user-data), AWS CLI |
+| **CI/CD** | GitHub Actions (fmt + validate workflow) |
+| **Languages** | HCL, Bash, JSON |
+| **Future Add-ons** | Prometheus, Grafana, Lambda-based automation |
+
+---
+
+## ğŸ§± Phases Implemented
+
 | Phase | Description |
 |--------|-------------|
-| [Phase 01](docs/PHASE-01.md) | EC2 Auto-Heal (ASG + ALB) |
-| [Phase 02](docs/PHASE-02.md) | Outputs & CloudWatch Monitoring |
-| [Phase 03](docs/PHASE-03.md) | CI/CD Workflow Setup |
-| Phase 04 | Final polish + optional dashboards |
+| **01** | EC2 Auto-Heal setup (ASG + ALB + health checks) |
+| **02** | Terraform outputs + CloudWatch alarms |
+| **03** | GitHub Actions CI (fmt + validate) |
+| **04** | CloudWatch dashboard visualization |
+| **05** | SNS alerting and failure recovery test |
+| **06** | Prometheus Node Exporter for metrics *(optional)* |
+
+> Each phase is documented in the `/docs` directory  
+(e.g. `docs/PHASE-01.md`, `docs/PHASE-05.md`)
 
 ---
 
-## íº€ Usage
-```bash
-cd infra/terraform/envs/dev
-terraform init
-terraform validate
-terraform plan -out=tfplan
-terraform apply "tfplan"
-ï¿½ï¿½â€í²» Author
-Akash K
-DevOps Engineer | AWS Certified Cloud Practitioner
-í²¼ LinkedIn
-í³‚ GitHub
+## âš¡ Setup Instructions
 
+```bash
+# Clone the repository
+git clone https://github.com/Akash-k27/autoheal-cloud-devops-platform.git
+cd autoheal-cloud-devops-platform/infra/terraform/envs/dev
+
+# Initialize and deploy infrastructure
+terraform init
+terraform apply -auto-approve
+
+# Verify the health endpoint
+curl -s http://$(terraform output -raw alb_dns_name)/health
+```
+
+### To simulate auto-healing
+```bash
+aws autoscaling terminate-instance-in-auto-scaling-group   --region ap-south-1   --instance-id <id>   --should-decrement-desired-capacity false
+```
+ASG automatically replaces the unhealthy instance ğŸ¯  
+Youâ€™ll receive SNS alerts via configured email.
+
+---
+
+## ğŸ“Š CloudWatch Monitoring
+The deployment creates:
+- **Dashboard:** `autoheal-cloud-dev`  
+- **Alarms:** `autoheal-web-tg-unhealthy-hosts`, `autoheal-web-target-5xx`  
+- **SNS Topic:** `autoheal-alerts`  
+- **Metrics:**  
+  - ALB `RequestCount`, `Target 5XX`
+  - ASG `InServiceInstances`
+  - TargetGroup `HealthyHostCount`, `UnHealthyHostCount`
+
+---
+
+## ğŸŒ Future Enhancements
+- Integrate Prometheus & Grafana dashboard
+- Add Lambda-based instance auto-tagging
+- Enable S3 backend for Terraform state
+- Include Jenkins CI/CD pipeline for modular deployments
+
+---
+
+## ğŸ‘¤ Author
+**Akash K** â€” *AWS Certified Cloud Practitioner*  
+ğŸš€ DevOps Engineer | Terraform | AWS | CI/CD | Kubernetes | Docker  
+ğŸ“§ [akash.k.22204@gmail.com](mailto:akash.k.22204@gmail.com)  
+ğŸ”— [LinkedIn](https://www.linkedin.com/in/akash-k-728a16207)  
+ğŸ”— [GitHub](https://github.com/Akash-k27)

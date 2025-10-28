@@ -54,6 +54,22 @@ Client → Application Load Balancer (HTTP:80)
           ├── EC2 Instance (Nginx + CloudWatch Agent)
           └── EC2 Instance (Nginx + Node Exporter)
 ```
+## 🧭 Architecture Overview
+
+### Phase 1 — Basic Self-Healing Infrastructure
+![Phase 1](./docs/architecture-phase1-basic.png)
+> Application Load Balancer routes traffic to EC2 instances in an Auto Scaling Group.  
+> CloudWatch monitors instance health and triggers SNS email alerts when failures occur.
+
+### Phase 3 — Monitoring Integration
+![Phase 3](./docs/architecture-phase3-monitoring.png)
+> Added Node Exporter for metrics collection.  
+> CloudWatch Dashboards visualize instance health, latency, and target group performance.
+
+### Phase 6 — Final AutoHeal Cloud Setup
+![Phase 6](./docs/architecture-phase6-final.png)
+> Complete setup with Terraform IaC, GitHub Actions CI/CD, ALB + ASG + EC2 (Node Exporters),  
+> CloudWatch Dashboards, SNS alerts, and self-healing automation.
 
 ---
 

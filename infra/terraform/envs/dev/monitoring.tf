@@ -47,61 +47,61 @@ resource "aws_cloudwatch_dashboard" "autoheal_dashboard" {
       # ALB: Request Count
       {
         type = "metric",
-        x = 0, y = 0, width = 12, height = 6,
+        x    = 0, y = 0, width = 12, height = 6,
         properties = {
-          title = "ALB RequestCount",
-          view = "timeSeries",
+          title  = "ALB RequestCount",
+          view   = "timeSeries",
           region = "ap-south-1",
           metrics = [
-            [ "AWS/ApplicationELB", "RequestCount", "LoadBalancer", module.svc.alb_arn_suffix ]
+            ["AWS/ApplicationELB", "RequestCount", "LoadBalancer", module.svc.alb_arn_suffix]
           ],
-          stat = "Sum",
+          stat   = "Sum",
           period = 60
         }
       },
       # Target 5XX
       {
         type = "metric",
-        x = 12, y = 0, width = 12, height = 6,
+        x    = 12, y = 0, width = 12, height = 6,
         properties = {
-          title = "Target 5XX",
-          view = "timeSeries",
+          title  = "Target 5XX",
+          view   = "timeSeries",
           region = "ap-south-1",
           metrics = [
-            [ "AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", "LoadBalancer", module.svc.alb_arn_suffix, "TargetGroup", module.svc.target_group_arn_suffix ]
+            ["AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", "LoadBalancer", module.svc.alb_arn_suffix, "TargetGroup", module.svc.target_group_arn_suffix]
           ],
-          stat = "Sum",
+          stat   = "Sum",
           period = 60
         }
       },
       # Healthy / Unhealthy hosts
       {
         type = "metric",
-        x = 0, y = 6, width = 12, height = 6,
+        x    = 0, y = 6, width = 12, height = 6,
         properties = {
-          title = "Targets Health",
-          view = "timeSeries",
+          title  = "Targets Health",
+          view   = "timeSeries",
           region = "ap-south-1",
           metrics = [
-            [ "AWS/ApplicationELB", "HealthyHostCount", "LoadBalancer", module.svc.alb_arn_suffix, "TargetGroup", module.svc.target_group_arn_suffix ],
-            [ ".", "UnHealthyHostCount", ".", ".", ".", "." ]
+            ["AWS/ApplicationELB", "HealthyHostCount", "LoadBalancer", module.svc.alb_arn_suffix, "TargetGroup", module.svc.target_group_arn_suffix],
+            [".", "UnHealthyHostCount", ".", ".", ".", "."]
           ],
-          stat = "Maximum",
+          stat   = "Maximum",
           period = 60
         }
       },
       # ASG InService instances
       {
         type = "metric",
-        x = 12, y = 6, width = 12, height = 6,
+        x    = 12, y = 6, width = 12, height = 6,
         properties = {
-          title = "ASG InService Instances",
-          view = "timeSeries",
+          title  = "ASG InService Instances",
+          view   = "timeSeries",
           region = "ap-south-1",
           metrics = [
-            [ "AWS/AutoScaling", "GroupInServiceInstances", "AutoScalingGroupName", module.svc.asg_name ]
+            ["AWS/AutoScaling", "GroupInServiceInstances", "AutoScalingGroupName", module.svc.asg_name]
           ],
-          stat = "Maximum",
+          stat   = "Maximum",
           period = 60
         }
       }

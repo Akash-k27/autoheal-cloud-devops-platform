@@ -89,3 +89,12 @@ resource "aws_autoscaling_group" "this" {
     create_before_destroy = true
   }
 }
+
+# Allow Prometheus node_exporter (port 9100)
+resource "aws_vpc_security_group_ingress_rule" "node_exporter_9100" {
+  security_group_id = aws_security_group.svc.id
+  from_port         = 9100
+  to_port           = 9100
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0" # demo; tighten to your IP/CIDR later
+}
